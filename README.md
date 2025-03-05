@@ -2,7 +2,7 @@
 
 ## 📌 **Project Overview**
 This project focuses on analyzing network traffic to identify application usage patterns, even when traffic is encrypted or anonymized.  
-We extract key traffic features from PCAP files, visualize network behaviors, and build machine learning models to classify traffic flows by application type.
+We extract key traffic features from PCAP/PCAPNG files, visualize network behaviors, and build machine learning models to classify traffic flows by application type.
 
 ---
 
@@ -17,7 +17,7 @@ Network-Traffic-Analysis-main/
 ├── src/                    # Source code for processing traffic data
 │   ├── question_3/         # Scripts for analyzing application-level traffic patterns
 │   │   ├── ques_3.py       # Main script for processing PCAPs and generating visualizations
-│   │   ├── recordings/     # Directory for storing PCAP recordings (not included in GitHub)
+│   │   ├── recordings/     # Directory for storing PCAP/PCAPNG recordings (not included in GitHub)
 │   │
 │   ├── question_4/         # Scripts for machine learning classification of network traffic
 │   │   ├── ques_4.py       # Main script for training and evaluating ML models
@@ -27,7 +27,6 @@ Network-Traffic-Analysis-main/
 │   ├── inter_arrival_times.png
 │   ├── packet_size_distribution.png
 │   ├── tcp_flag_distribution.png
-│   ├── tls_packets_per_app.png
 │   ├── traffic_analysis.csv
 │   ||| and more png
 ```
@@ -38,7 +37,7 @@ Network-Traffic-Analysis-main/
 Before running the scripts, you need to download the following files:
 
 ### 1️⃣ **Download Recordings**
-The PCAPNG recordings are available at the following link:  
+The PCAPNG/PCAP recordings are available at the following link:  
 - [Download PCAPNG Recordings Link(compressed)]
 - https://drive.usercontent.google.com/download?id=14X829KINkmqASNlD0QL5SC-1FJPSJMLY&export=download&authuser=0
 
@@ -64,6 +63,66 @@ After downloading, extract the ZIP file into the following directory(name it com
 │   │   ├── ques_4.py       # Main script for training and evaluating ML models
 │   │   ├── combined_dataset.csv  # Preprocessed dataset for direct ML training
 ```
+
+## 📂 Dataset Format
+- The dataset should be provided as a **CSV file** (`combined_dataset.csv`).
+- The file should contain **one row per network packet** with the following required columns.
+
+---
+
+## 📑 Required Columns
+| Column Name       | Data Type  | Description |
+|-------------------|------------|-------------|
+| `Timestamp`       | `float64`   | UNIX timestamp of when the packet was captured. |
+| `Size`           | `int`       | Packet size in bytes. |
+| `Source IP`      | `string`    | Sender IP address (IPv4). |
+| `Dest IP`        | `string`    | Receiver IP address (IPv4). |
+| `Source Port`    | `int`       | Source port number. |
+| `Dest Port`      | `int`       | Destination port number. |
+| `Classification` | `int`       | Numerical category representing the application or protocol (e.g., `0` for Chrome, `1` for YouTube, `2` for Zoom). |
+
+---
+
+## 🔧 Features Generated in the Script
+The script processes the dataset and generates additional features:
+
+- **`Source IP Numeric`** → Integer representation of `Source IP`.
+- **`Dest IP Numeric`** → Integer representation of `Dest IP`.
+- **`Flow ID`** → Combination of `Source IP Numeric`, `Dest IP Numeric`, `Source Port`, and `Dest Port`.
+- **`Flow ID Hash`** → A numeric hash of `Flow ID` (for feature stability).
+- **`Inter-Arrival Time`** → Time difference between consecutive packets in the same flow.
+
+---
+
+## 📋 Example Row
+| Timestamp   | Size | Source IP  | Dest IP    | Source Port | Dest Port | Classification |
+|------------|------|------------|------------|-------------|-----------|----------------|
+| 1678901234.5 | 1024 | 192.168.1.10 | 93.184.216.34 | 52345 | 443 | 1 |
+
+---
+
+## ⚠️ Important Guidelines
+
+- **Ensure all required columns exist** in the dataset.
+- **Data types must be correct** (IP addresses as strings, ports as integers, timestamps as float/int).
+- **Timestamps should be sorted** to properly calculate `Inter-Arrival Time`.
+- **Each row should have a valid `Classification` number** corresponding to the application category.
+
+---
+
+## 🚀 How to Use the Dataset
+1. Place your dataset file (`combined_dataset.csv`) in the project directory.
+2. Run the script:  
+   ```bash
+   python your_script.py
+   ```
+3. The script will preprocess the dataset, extract relevant features, and train the classification model.
+
+---
+
+For any issues or dataset-related questions, feel free to open an issue in the repository! 📩
+
+
 ---
 ### 🔑 **Adding Keys for Traffic Decryption in Wireshark**
 
